@@ -1,0 +1,12 @@
+#emacs_ignore
+*~
+\#*\#
+*\.el[c|d]
+.\#*
+
+# projectile files
+.projectile
+
+
+#build files
+dist-newstyle/

@@ -1,35 +1,61 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
-
 #include <iostream>
-
-int main()
+#include <stdexcept>
+#include <cstdlib>
+#include <memory>
+class BoardGame
 {
-    glfwInit();
-
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
-
-    uint32_t extensionCount = 0;
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-
-    std::cout << extensionCount << "extensions supported" << std::endl;
-
-    glm::mat4 matrix;
-    glm::vec4 vec;
-    auto test = matrix * vec;
-
-    while(!glfwWindowShouldClose(window)){
-        glfwPollEvents();
+    const uint32_t WIDTH = 800;
+    const uint32_t HEIGHT = 600;
+public:
+    void run() {
+        initWindow();
+        initVulkan();
+        mainLoop();
+        cleanup();
     }
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    BoardGame()
+        : sp_window(nullptr, nullptr)
+    {
+    }
+    
+private:
+    std::unique_ptr<GLFWwindow, decltype(&glfwDestroyWindow)> sp_window;
+    void initWindow(){
+        glfwInit();
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        sp_window = std::unique_ptr<GLFWwindow, decltype(&glfwDestroyWindow)>(glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr), glfwDestroyWindow);
+    }
+    
+    void initVulkan(){
+        
+    }
 
-    return 0;
+    void mainLoop(){
+        while(!glfwWindowShouldClose(sp_window.get())){
+                glfwPollEvents();
+            }
+    }
+
+    void cleanup(){
+        glfwTerminate();
+    }
+};
+
+int main(int argc, char* argv[]){
+    BoardGame app;
+
+    try {
+        app.run();
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
+
